@@ -42,9 +42,11 @@ jobs:
       - name: Package plugins
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          cd build/Sound.of.Music_artefacts
-          tar cf ../../Sound.of.Music.1-linux-vst3.tar VST3/Sound.of.Music.vst3
-          tar cf ../../Sound.of.Music.1-linux-lv2.tar LV2/Sound.of.Music.lv2
+          VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
+          LV2=$(find build -name "Sound.of.Music.lv2" -type d | head -1)
+          echo "VST3=$VST3 LV2=$LV2"
+          tar cf Sound.of.Music.1-linux-vst3.tar -C "$(dirname "$VST3")" "$(basename "$VST3")"
+          tar cf Sound.of.Music.1-linux-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -75,9 +77,11 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         shell: bash
         run: |
-          cd build/Sound.of.Music_artefacts/Release
-          tar cf ../../../Sound.of.Music.1-windows-vst3.tar VST3/Sound.of.Music.vst3
-          tar cf ../../../Sound.of.Music.1-windows-lv2.tar LV2/Sound.of.Music.lv2
+          VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
+          LV2=$(find build -name "Sound.of.Music.lv2" -type d | head -1)
+          echo "VST3=$VST3 LV2=$LV2"
+          tar cf Sound.of.Music.1-windows-vst3.tar -C "$(dirname "$VST3")" "$(basename "$VST3")"
+          tar cf Sound.of.Music.1-windows-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -107,10 +111,13 @@ jobs:
       - name: Package plugins
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          cd build/Sound.of.Music_artefacts/Release
-          tar cf ../../../Sound.of.Music.1-macos-vst3.tar VST3/Sound.of.Music.vst3
-          tar cf ../../../Sound.of.Music.1-macos-au.tar AU/Sound.of.Music.component
-          tar cf ../../../Sound.of.Music.1-macos-lv2.tar LV2/Sound.of.Music.lv2
+          VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
+          AU=$(find build -name "Sound.of.Music.component" -type d | head -1)
+          LV2=$(find build -name "Sound.of.Music.lv2" -type d | head -1)
+          echo "VST3=$VST3 AU=$AU LV2=$LV2"
+          tar cf Sound.of.Music.1-macos-vst3.tar -C "$(dirname "$VST3")" "$(basename "$VST3")"
+          tar cf Sound.of.Music.1-macos-au.tar -C "$(dirname "$AU")" "$(basename "$AU")"
+          tar cf Sound.of.Music.1-macos-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
