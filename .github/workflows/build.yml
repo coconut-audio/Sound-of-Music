@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [dev, main]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -31,16 +31,23 @@ jobs:
             libxrender-dev
 
       - name: Configure
-        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build 2>&1 | tee build.log
+
+      - name: Check for warnings
+        run: |
+          if grep -E "source/.*warning:" build.log | grep -v "modules/" | grep -v "gtest/" | grep -v "BinaryData"; then
+            echo "::error::Warnings found in project code"
+            exit 1
+          fi
 
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
       - name: Package plugins
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         run: |
           VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
           LV2=$(find build -name "Sound.of.Music.lv2" -type d | head -1)
@@ -49,7 +56,7 @@ jobs:
           tar cf Sound.of.Music.1-linux-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: Sound.of.Music.1-linux
@@ -65,16 +72,24 @@ jobs:
           submodules: recursive
 
       - name: Configure
-        run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release 2>&1 | tee build.log
+
+      - name: Check for warnings
+        shell: bash
+        run: |
+          if grep -iE "warning C[0-9]+" build.log | grep -v "modules\\" | grep -v "gtest\\" | grep -v "BinaryData"; then
+            echo "::error::Warnings found in project code"
+            exit 1
+          fi
 
       - name: Test
         run: ctest --test-dir build --output-on-failure -C Release
 
       - name: Package plugins
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         shell: bash
         run: |
           VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
@@ -84,7 +99,7 @@ jobs:
           tar cf Sound.of.Music.1-windows-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: Sound.of.Music.1-windows
@@ -100,16 +115,23 @@ jobs:
           submodules: recursive
 
       - name: Configure
-        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build 2>&1 | tee build.log
+
+      - name: Check for warnings
+        run: |
+          if grep -E "source/.*warning:" build.log | grep -v "modules/" | grep -v "gtest/" | grep -v "BinaryData"; then
+            echo "::error::Warnings found in project code"
+            exit 1
+          fi
 
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
       - name: Package plugins
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         run: |
           VST3=$(find build -name "Sound.of.Music.vst3" -type d | head -1)
           AU=$(find build -name "Sound.of.Music.component" -type d | head -1)
@@ -120,7 +142,7 @@ jobs:
           tar cf Sound.of.Music.1-macos-lv2.tar -C "$(dirname "$LV2")" "$(basename "$LV2")"
 
       - name: Upload artifacts
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: Sound.of.Music.1-macos
@@ -130,7 +152,6 @@ jobs:
             Sound.of.Music.1-macos-lv2.tar
 
   release:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-22.04
     permissions:
@@ -146,7 +167,6 @@ jobs:
         with:
           tag_name: v1.0.0
           name: Sound of Music v1.0.0
-          generate_release_notes: true
           files: |
             artifacts/Sound.of.Music.1-linux/*.tar
             artifacts/Sound.of.Music.1-windows/*.tar
