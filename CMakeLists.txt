@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(SOUND_OF_MUSIC VERSION 0.0.1)
+project(SOUND_OF_MUSIC VERSION 1.0.0)
 
 set(PROJECT_NAME Sound.of.Music)
-set(CURRENT_VERSION 0.0.1)
+set(CURRENT_VERSION 1.0.0)
 set(CURRENT_PLUGIN_CODE SoMu)
 
 message(STATUS "Plugin Name: ${PROJECT_NAME}")
@@ -18,7 +18,10 @@ endif()
 add_subdirectory(modules/JUCE)
 add_subdirectory(modules/googletest)
 
-set(FORMATS VST3 Standalone)
+set(FORMATS VST3 LV2)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    list(APPEND FORMATS AU)
+endif()
 
 juce_add_plugin(${PROJECT_NAME}
     VERSION ${CURRENT_VERSION}
@@ -32,7 +35,8 @@ juce_add_plugin(${PROJECT_NAME}
     PLUGIN_MANUFACTURER_CODE COAU
     FORMATS "${FORMATS}"
     PRODUCT_NAME "${PROJECT_NAME}"
-    PLUGIN_CODE "${CURRENT_PLUGIN_CODE}")
+    PLUGIN_CODE "${CURRENT_PLUGIN_CODE}"
+    LV2URI "https://coconutaudio.com/plugins/Sound.of.Music")
 
 target_sources(${PROJECT_NAME}
     PRIVATE
