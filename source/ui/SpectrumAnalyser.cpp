@@ -98,7 +98,7 @@ void SpectrumAnalyser::paint(Graphics& g)
         else
             frequencyLabel = String(frequencyValue);
 
-        g.drawFittedText(frequencyLabel, Rectangle<int>(static_cast<int>(xPosition) - 25, componentBounds.getBottom() - 20, 50, 20),
+        g.drawFittedText(frequencyLabel, Rectangle<int>(static_cast<int>(xPosition) - 25, static_cast<int>(componentBounds.getBottom()) - 20, 50, 20),
                          Justification::centred, 1);
     }
 
@@ -128,7 +128,7 @@ void SpectrumAnalyser::paint(Graphics& g)
 
         g.setColour(Colour(0xB0FFFFFF));
         g.setFont(13.0f);
-        g.drawFittedText(frequencyLabel, Rectangle<int>(static_cast<int>(centerX) - 25, componentBounds.getBottom() + 10, 50, 18),
+        g.drawFittedText(frequencyLabel, Rectangle<int>(static_cast<int>(centerX) - 25, static_cast<int>(componentBounds.getBottom()) + 10, 50, 18),
                          Justification::centred, 1);
     }
 

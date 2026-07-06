@@ -10,10 +10,10 @@ public:
                           float sliderPosition, float rotaryStartAngle, float rotaryEndAngle,
                           Slider&) override
     {
-        float diameter = jmin(width, height);
+        float diameter = static_cast<float>(jmin(width, height));
         float radius = diameter / 2.0f;
-        float centerX = x + width / 2.0f;
-        float centerY = y + height / 2.0f;
+        float centerX = static_cast<float>(x) + static_cast<float>(width) / 2.0f;
+        float centerY = static_cast<float>(y) + static_cast<float>(height) / 2.0f;
         float arcWidth = 3.0f;
         float currentAngle = rotaryStartAngle + sliderPosition * (rotaryEndAngle - rotaryStartAngle);
 

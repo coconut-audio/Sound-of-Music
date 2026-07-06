@@ -10,6 +10,11 @@ message(STATUS "Plugin Name: ${PROJECT_NAME}")
 message(STATUS "Version: ${CURRENT_VERSION}")
 message(STATUS "Plugin Code: ${CURRENT_PLUGIN_CODE}")
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS version" FORCE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+endif()
+
 add_subdirectory(modules/JUCE)
 add_subdirectory(modules/googletest)
 
@@ -28,11 +33,6 @@ juce_add_plugin(${PROJECT_NAME}
     FORMATS "${FORMATS}"
     PRODUCT_NAME "${PROJECT_NAME}"
     PLUGIN_CODE "${CURRENT_PLUGIN_CODE}")
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS version" FORCE)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
-endif()
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -59,25 +59,11 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
-if(MSVC)
-    target_compile_definitions(${PROJECT_NAME}
-        PRIVATE
-        JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_WEB_BROWSER=0
-        JUCE_USE_CURL=0)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_compile_definitions(${PROJECT_NAME}
-        PRIVATE
-        JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_WEB_BROWSER=0
-        JUCE_USE_CURL=0)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_definitions(${PROJECT_NAME}
-        PRIVATE
-        JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_WEB_BROWSER=0
-        JUCE_USE_CURL=0)
-endif()
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0)
 
 enable_testing()
 add_executable(Tests

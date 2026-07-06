@@ -13,7 +13,7 @@ public:
 
     float process(float inputSample, float drySample)
     {
-        float outputSample = inputSample + (randomGenerator.nextInt(3) - 1) * noiseAmount * drySample;
+        float outputSample = inputSample + static_cast<float>(randomGenerator.nextInt(3) - 1) * noiseAmount * drySample;
 
         if (crackleProbability > 0 && randomGenerator.nextInt(100 - crackleProbability + 2) == 0 && randomGenerator.nextInt(10) != 0)
             outputSample = 0.0f;
